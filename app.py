@@ -8,21 +8,20 @@ app = Flask(__name__)
 def bienvenido():
     return 'Hola mundo Tecker, desde TempTech'
 
-#Enviar mensaje de texto a whatsapp
-@app.route('/webhook', methods =['GET'])
+@app.route('/webhook', methods=['GET'])
 def verificarToken():
     try:
         token = request.args.get('hub.verify_token')
         challenge = request.args.get('hub.challenge')
 
-        if token == sett.token and challenge != None:
-            return challenge
+        if token == sett.token and challenge:
+            return challenge, 200
         else: 
-            return 'token incorrecto mi papa', 403
+            return 'Token incorrecto, acceso no autorizado', 403
     except Exception as e:
-        return e,403
+        return str(e), 403
     
-@app.route('/webhook', methods =['POST'])
+@app.route('/webhook', methods=['POST'])
 def recibirMensaje():
     try:
         body = request.get_json()
@@ -39,9 +38,8 @@ def recibirMensaje():
         services.administrar_chatbot(text, number, messageId, name)
         return 'Enviado'
 
-
     except Exception as e:
-        return 'no enviado ' + str(e)
+        return 'No enviado: ' + str(e)
 
 if __name__ == '__main__':
     app.run()
